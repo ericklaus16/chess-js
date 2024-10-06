@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/piece.tsx","./src/components/tabuleiro.tsx","./src/pieces/bishop.ts","./src/pieces/king.ts","./src/pieces/knight.ts","./src/pieces/pawn.ts","./src/pieces/piece.ts","./src/pieces/queen.ts","./src/pieces/rook.ts"],"version":"5.6.2"}

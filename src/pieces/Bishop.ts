@@ -37,7 +37,7 @@ class Bishop extends PieceClass {
                     moves.push([targetRow, targetCol]);
                 } 
                 // Se encontrar uma peça da cor oposta, também adiciona como movimento válido
-                else if (this.getColor() == colorTargetPiece) {
+                else if (this.getColor() != colorTargetPiece) {
                     moves.push([targetRow, targetCol]);
                     break; 
                 } else {

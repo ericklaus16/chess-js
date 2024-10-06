@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Piece from "./Piece";
 import Pawn from "../pieces/Pawn";
 import Rook from "../pieces/Rook";
@@ -20,24 +20,83 @@ const Tabuleiro = () => {
         ['peao', 'peao', 'peao', 'peao', 'peao', 'peao', 'peao', 'peao'],
         ['torre', 'cavalo', 'bispo', 'dama', 'rei', 'bispo', 'cavalo', 'torre']
     ]);
+    const [gameOver, setGameOver] = useState(false);
+    const [winner, setWinner] = useState<string | null>(null);
+
+    const resetGame = () => {
+        setPecas([
+            ['Torre', 'Cavalo', 'Bispo', 'Dama', 'Rei', 'Bispo', 'Cavalo', 'Torre'],
+            ['Peao', 'Peao', 'Peao', 'Peao', 'Peao', 'Peao', 'Peao', 'Peao'],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            ['peao', 'peao', 'peao', 'peao', 'peao', 'peao', 'peao', 'peao'],
+            ['torre', 'cavalo', 'bispo', 'dama', 'rei', 'bispo', 'cavalo', 'torre']
+        ]);
+        setSelectedPiece(null);
+        setValidMoves([]);
+        setGameOver(false);
+        setWinner(null);
+    };
+
+    const checkVictoryConditions = () => {
+        const whiteKingPosition = findKingPosition('rei');
+        const blackKingPosition = findKingPosition('Rei');
+    
+        if (!whiteKingPosition) {
+            setGameOver(true);
+            setWinner('Pretas');
+        }
+        // Se o rei preto não está na tabela
+        else if (!blackKingPosition) {
+            setGameOver(true);
+            setWinner('Brancas');
+        }
+    };
+    
+    useEffect(() => {
+        checkVictoryConditions();
+    }, [pecas]);
+
+    const findKingPosition = (king: string) => {
+        for (let i = 0; i < pecas.length; i++) {
+            for (let j = 0; j < pecas[i].length; j++) {
+                if (pecas[i][j] === king) {
+                    return [i, j];
+                }
+            }
+        }
+        return null;
+    };
 
     const handlePieceClick = (linhaIndex: number, colunaIndex: number, peca: string) => {
+        if (gameOver) return;
+    
         if (selectedPiece) {
             const [selectedRow, selectedCol] = selectedPiece;
-
+    
             if (validMoves.some(([row, col]) => row === linhaIndex && col === colunaIndex)) {
                 const updatedPecas = pecas.map((linha) => [...linha]);
-
-                updatedPecas[linhaIndex][colunaIndex] = updatedPecas[selectedRow][selectedCol];
-                updatedPecas[selectedRow][selectedCol] = ' ';
-
+    
+                const targetPiece = updatedPecas[linhaIndex][colunaIndex];
+                
+                if (targetPiece !== ' ' && targetPiece[0] !== peca[0]) {
+                    updatedPecas[linhaIndex][colunaIndex] = updatedPecas[selectedRow][selectedCol];
+                    updatedPecas[selectedRow][selectedCol] = ' ';
+                } else {
+                    updatedPecas[linhaIndex][colunaIndex] = updatedPecas[selectedRow][selectedCol];
+                    updatedPecas[selectedRow][selectedCol] = ' ';
+                }
+    
                 setPecas(updatedPecas);
-
+                checkVictoryConditions();
+    
                 setSelectedPiece(null);
-                setValidMoves([]);
+                setValidMoves([]); 
                 return;
             } else {
-                setValidMoves([]); 
+                setValidMoves([]);
             }
         }
 
@@ -91,9 +150,17 @@ const Tabuleiro = () => {
             setValidMoves(moves);
         }
     };
-
+    
     return (
         <div>
+            {gameOver && (
+                <div className="text-center items-center flex flex-col my-4">
+                    <p className="text-2xl">{winner ? `Vitória para ${winner}!` : "Empate!"}</p>
+                    <button 
+                    onClick={resetGame}
+                    className="bg-blue-500 text-white p-2 mt-4 w-auto rounded-lg">Jogar de novo</button>
+                </div>
+            )}
             <div className='grid grid-cols-8 gap-0'>
                 {pecas.map((linha, linhaIndex) => (
                     linha.map((peca, colunaIndex) => {

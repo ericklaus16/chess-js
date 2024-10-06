@@ -13,73 +13,37 @@ import Bispo_B from "../assets/bishop_b.png";
 import Dama_B from "../assets/queen_b.png";
 import Rei_B from "../assets/king_b.png";
 
-
-import PieceClass from "../pieces/Piece";
-import Pawn from "../pieces/Pawn";
-import Rook from "../pieces/Rook";
-
-
 type PieceType = {
-    color: string;
-    type: string;
+    color: string; // "black" ou "white"
+    type: string; // "Peao", "Torre", etc.
     position: [number, number];
-}
+};
 
-const Piece = (props: PieceType) => {
-    const [row, col] = props.position;
+const Piece = ({ color, type, position }: PieceType) => {
     const [image, setImage] = useState<string>();
 
     useEffect(() => {
-        console.log(`A peça ${props.type} está na posição ${row}, ${col}`);
-        console.log(`${props.type}.png`)
+        const pieceImages: Record<string, string> = {
+            Peao: Peao_B,
+            peao: Peao,
+            Torre: Torre_B,
+            torre: Torre,
+            Cavalo: Cavalo_B,
+            cavalo: Cavalo,
+            Bispo: Bispo_B,
+            bispo: Bispo,
+            Dama: Dama_B,
+            dama: Dama,
+            Rei: Rei_B,
+            rei: Rei,
+        };
 
-        switch (props.type) {
-            case 'Peao':
-                setImage(Peao_B);
-                break;
-            case 'peao':
-                setImage(Peao);
-                break;
-            case 'Torre':
-                setImage(Torre_B);
-                break;
-            case 'torre':
-                setImage(Torre);
-                break;
-            case 'Cavalo':
-                setImage(Cavalo_B);
-                break;
-            case 'cavalo':
-                setImage(Cavalo);
-                break;
-            case 'Bispo':
-                setImage(Bispo_B);
-                break;
-            case 'bispo':
-                setImage(Bispo);
-                break;
-            case 'Dama':
-                setImage(Dama_B);
-                break;
-            case 'dama':
-                setImage(Dama);
-                break;
-            case 'Rei':
-                setImage(Rei_B);
-                break;
-            case 'rei':
-                setImage(Rei);
-                break;
-            default:
-                setImage('');
-                break;
-        }
-
-    }, [])
+        setImage(pieceImages[type] || ''); // Definindo a imagem de acordo com o tipo da peça
+    }, [type]);
 
     return (
-        <img src={image} className=""/>
+        <img src={image} alt={`${type} ${color}`} className="" />
     );
-}
+};
 
 export default Piece;
