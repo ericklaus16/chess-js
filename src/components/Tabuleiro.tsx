@@ -161,7 +161,7 @@ const Tabuleiro = () => {
                     className="bg-blue-500 text-white p-2 mt-4 w-auto rounded-lg">Jogar de novo</button>
                 </div>
             )}
-            <div className='grid grid-cols-8 gap-0'>
+            <div className='grid grid-cols-8 gap-0 border-2 border-[#1f651f] shadow-lg'>
                 {pecas.map((linha, linhaIndex) => (
                     linha.map((peca, colunaIndex) => {
                         const casaColor = (linhaIndex + colunaIndex) % 2 === 0 ? 'bg-[#dec88f]' : 'bg-[#996035]'; // Verifica a cor da casa

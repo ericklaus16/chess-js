@@ -19,7 +19,7 @@ type PieceType = {
     position: [number, number];
 };
 
-const Piece = ({ color, type, position }: PieceType) => {
+const Piece = ({ color, type }: PieceType) => {
     const [image, setImage] = useState<string>();
 
     useEffect(() => {
