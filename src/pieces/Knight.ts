@@ -20,9 +20,9 @@ class Knight extends PieceClass {
 
             if (targetRow >= 0 && targetRow < 8 && targetCol >= 0 && targetCol < 8) {
                 const targetPiece = tabuleiro[targetRow][targetCol];
-                console.log(targetPiece)
+                const colorTargetPiece = targetPiece[0] === targetPiece[0].toUpperCase() ? 'black' : 'white';
 
-                if (targetPiece === ' ' || targetPiece[0] !== targetPiece[0]) {
+                if (targetPiece === ' ' || this.getColor() !== colorTargetPiece) {
                     moves.push([targetRow, targetCol]);
                 }
             }

@@ -4,6 +4,8 @@ import Pawn from "../pieces/Pawn";
 import Rook from "../pieces/Rook";
 import Knight from "../pieces/Knight";
 import Bishop from "../pieces/Bishop";
+import Queen from "../pieces/Queen";
+import King from "../pieces/King";
 
 const Tabuleiro = () => {
     const [selectedPiece, setSelectedPiece] = useState<[number, number] | null>(null);
@@ -67,6 +69,18 @@ const Tabuleiro = () => {
             case 'bispo':
                 pieceInstance = new Bishop('white', [linhaIndex, colunaIndex]);
                 break;
+            case 'Dama':
+                pieceInstance = new Queen('black', [linhaIndex, colunaIndex]);
+                break;
+            case 'dama':
+                pieceInstance = new Queen('white', [linhaIndex, colunaIndex]);
+                break;
+            case 'Rei':
+                pieceInstance = new King('black', [linhaIndex, colunaIndex]);
+                break;
+            case 'rei':
+                pieceInstance = new King('white', [linhaIndex, colunaIndex]);
+                break;
             default:
                 pieceInstance = null;
                 break;
@@ -83,7 +97,6 @@ const Tabuleiro = () => {
             <div className='grid grid-cols-8 gap-0'>
                 {pecas.map((linha, linhaIndex) => (
                     linha.map((peca, colunaIndex) => {
-                        const casaIndex = linhaIndex * 8 + colunaIndex;
                         const casaColor = (linhaIndex + colunaIndex) % 2 === 0 ? 'bg-[#dec88f]' : 'bg-[#996035]'; // Verifica a cor da casa
 
                         const isMoveValid = validMoves.some(([row, col]) => row === linhaIndex && col === colunaIndex);

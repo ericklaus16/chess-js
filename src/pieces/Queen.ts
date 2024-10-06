@@ -1,16 +1,20 @@
 import PieceClass from "./Piece";
 
-class Bishop extends PieceClass {
+class Queen extends PieceClass {
     constructor(color: string, position: [number, number]) {
-        super(color, 'Bishop', position);
+        super(color, 'Queen', position);
     }
 
     public getMoves(tabuleiro: string[][]): [number, number][] {
         const [row, col] = this.getPosition();
         const moves: [number, number][] = [];
 
-        // Direções de movimento do Bispo: diagonal
+        // Direções de movimento da Dama: vertical, horizontal e diagonal
         const directions = [
+            [1, 0],   // Para baixo
+            [-1, 0],  // Para cima
+            [0, 1],   // Para a direita
+            [0, -1],  // Para a esquerda
             [1, 1],   // Diagonal inferior direita
             [1, -1],  // Diagonal inferior esquerda
             [-1, 1],  // Diagonal superior direita
@@ -25,7 +29,6 @@ class Bishop extends PieceClass {
                 targetRow += dRow;
                 targetCol += dCol;
 
-                // Verifica se a nova posição está dentro dos limites do tabuleiro
                 if (targetRow < 0 || targetRow >= 8 || targetCol < 0 || targetCol >= 8) {
                     break;
                 }
@@ -36,11 +39,11 @@ class Bishop extends PieceClass {
                 if (targetPiece === ' ') {
                     moves.push([targetRow, targetCol]);
                 } 
-                // Se encontrar uma peça da cor oposta, também adiciona como movimento válido
-                else if (this.getColor() == colorTargetPiece) {
+                else if (this.getColor() !== colorTargetPiece) {
                     moves.push([targetRow, targetCol]);
                     break; 
-                } else {
+                } 
+                else {
                     break;
                 }
             }
@@ -50,4 +53,4 @@ class Bishop extends PieceClass {
     }
 }
 
-export default Bishop;
+export default Queen;
