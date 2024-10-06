@@ -16,6 +16,7 @@ import Rei_B from "../assets/king_b.png";
 
 import PieceClass from "../pieces/Piece";
 import Pawn from "../pieces/Pawn";
+import Rook from "../pieces/Rook";
 
 
 type PieceType = {
@@ -27,7 +28,6 @@ type PieceType = {
 const Piece = (props: PieceType) => {
     const [row, col] = props.position;
     const [image, setImage] = useState<string>();
-    const [pieceClass, setPieceClass] = useState<PieceClass>();
 
     useEffect(() => {
         console.log(`A peça ${props.type} está na posição ${row}, ${col}`);
@@ -36,11 +36,9 @@ const Piece = (props: PieceType) => {
         switch (props.type) {
             case 'Peao':
                 setImage(Peao_B);
-                setPieceClass(new Pawn('black', [row, col]));
                 break;
             case 'peao':
                 setImage(Peao);
-                setPieceClass(new Pawn('white', [row, col]));
                 break;
             case 'Torre':
                 setImage(Torre_B);
@@ -80,9 +78,7 @@ const Piece = (props: PieceType) => {
     }, [])
 
     return (
-        <div onClick={() => console.log(pieceClass?.getMoves())}>
-            <img src={image} className=""/>
-        </div>
+        <img src={image} className=""/>
     );
 }
 
