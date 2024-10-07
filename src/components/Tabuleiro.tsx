@@ -22,6 +22,13 @@ const Tabuleiro = () => {
     ]);
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState<string | null>(null);
+    const [timerWhite, setTimerWhite] = useState(300);
+    const [timerWhiteConverted, setTimerWhiteConverted] = useState('');
+    const [timerBlack, setTimerBlack] = useState(300);
+    const [timerBlackConverted, setTimerBlackConverted] = useState('');
+    const [turn, setTurn] = useState('white');
+    const [intervalId, setIntervalId] = useState<number | null>(null);
+    const [currentPieceColor, setIsCurrentPieceColor] = useState("black");
 
     const resetGame = () => {
         setPecas([
@@ -38,6 +45,12 @@ const Tabuleiro = () => {
         setValidMoves([]);
         setGameOver(false);
         setWinner(null);
+        setTimerWhite(300);
+        setTimerBlack(300);
+        if (intervalId) {
+            clearInterval(intervalId);
+            setIntervalId(null);
+        }
     };
 
     const checkVictoryConditions = () => {
@@ -47,9 +60,7 @@ const Tabuleiro = () => {
         if (!whiteKingPosition) {
             setGameOver(true);
             setWinner('Pretas');
-        }
-        // Se o rei preto não está na tabela
-        else if (!blackKingPosition) {
+        } else if (!blackKingPosition) {
             setGameOver(true);
             setWinner('Brancas');
         }
@@ -58,6 +69,13 @@ const Tabuleiro = () => {
     useEffect(() => {
         checkVictoryConditions();
     }, [pecas]);
+
+    useEffect(() => {
+        if (!gameOver) {
+            setTimerWhiteConverted(handleFormatTime(timerWhite));
+            setTimerBlackConverted(handleFormatTime(timerBlack));
+        }
+    }, [timerWhite, timerBlack]);
 
     const findKingPosition = (king: string) => {
         for (let i = 0; i < pecas.length; i++) {
@@ -70,10 +88,27 @@ const Tabuleiro = () => {
         return null;
     };
 
+    const decreaseTimer = (currentTimer: number, setCurrentTimer: (time: number) => void) => {
+        if (currentTimer > 0) {
+            const newTimer = currentTimer - 1;
+            setCurrentTimer(newTimer);
+
+            if (newTimer === 0) {
+                setGameOver(true);
+                setWinner(turn === 'white' ? 'Pretas' : 'Brancas');
+            }
+        }
+    };
+
     const handlePieceClick = (linhaIndex: number, colunaIndex: number, peca: string) => {
-        if (gameOver) return;
-    
-        if (selectedPiece) {
+        if(peca !== " " && peca[0] !== peca[0].toUpperCase())
+            setIsCurrentPieceColor("white");
+        else if(peca !== " " && peca[0] !== peca[0].toLowerCase())
+            setIsCurrentPieceColor("black");
+        
+        if (gameOver || (turn === "white" && currentPieceColor === "black") || (turn === "black" && currentPieceColor === "white")) return;
+
+        if (selectedPiece && turn === currentPieceColor) {
             const [selectedRow, selectedCol] = selectedPiece;
     
             if (validMoves.some(([row, col]) => row === linhaIndex && col === colunaIndex)) {
@@ -94,6 +129,7 @@ const Tabuleiro = () => {
     
                 setSelectedPiece(null);
                 setValidMoves([]); 
+                setTurn((prevTurn) => (prevTurn === 'white' ? 'black' : 'white'));
                 return;
             } else {
                 setValidMoves([]);
@@ -150,29 +186,57 @@ const Tabuleiro = () => {
             setValidMoves(moves);
         }
     };
-    
+
+    const handleFormatTime = (time: number): string => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+    };
+
+    useEffect(() => {
+        if (timerWhite > 0 || timerBlack > 0) {
+            const id = setInterval(() => {
+                if (turn === 'white' && timerWhite > 0) {
+                    decreaseTimer(timerWhite, setTimerWhite);
+                } else if (turn === 'black' && timerBlack > 0) {
+                    decreaseTimer(timerBlack, setTimerBlack);
+                }
+            }, 1000);
+            setIntervalId(id);
+            return () => clearInterval(id);
+        }
+    }, [turn, timerWhite, timerBlack]);
+
     return (
-        <div>
+        <div className="w-[80vw] flex flex-col items-center justify-center">
             {gameOver && (
-                <div className="text-center items-center flex flex-col my-4">
-                    <p className="text-2xl">{winner ? `Vitória para ${winner}!` : "Empate!"}</p>
+                <div className="text-center">
+                    <p className="text-2xl text-white">{winner ? `Vitória para ${winner}!` : "Empate!"}</p>
                     <button 
                     onClick={resetGame}
-                    className="bg-blue-500 text-white p-2 mt-4 w-auto rounded-lg">Jogar de novo</button>
+                    className="my-2 p-2 bg-green-600 rounded">Reiniciar jogo</button>
                 </div>
             )}
+            <div className="flex flex-row w-2/4 items-center justify-between">
+                <div className="mr-4 text-center">
+                    <p className="text-white text-lg font-bold">Tempo Brancas</p>
+                    <p className="text-white text-lg font-bold">{timerWhiteConverted}</p>
+                </div>
+                <div className="text-center">
+                    <p className="text-white">Tempo Pretas</p>
+                    <p className="text-white text-lg font-bold">{timerBlackConverted}</p>
+                </div>
+            </div>
             <div className='grid grid-cols-8 gap-0 border-2 border-[#1f651f] shadow-lg'>
                 {pecas.map((linha, linhaIndex) => (
                     linha.map((peca, colunaIndex) => {
                         const casaColor = (linhaIndex + colunaIndex) % 2 === 0 ? 'bg-[#dec88f]' : 'bg-[#996035]'; // Verifica a cor da casa
-
-                        const isMoveValid = validMoves.some(([row, col]) => row === linhaIndex && col === colunaIndex);
-                        const highlightClass = isMoveValid ? 'bg-green-500' : '';
-
+                        const isMoveValid = validMoves.some(([row, col]) => row === linhaIndex && col === colunaIndex) && currentPieceColor === turn;
+                        const highlightClass = isMoveValid && selectedPiece && currentPieceColor === turn ? 'bg-green-500' : '';
                         return (
                             <div
                                 key={`${linhaIndex}-${colunaIndex}`}
-                                className={`w-16 h-16 flex items-center justify-center ${casaColor} ${highlightClass}`}
+                                className={`w-16 h-16  ${casaColor} ${highlightClass}`}
                                 onClick={() => handlePieceClick(linhaIndex, colunaIndex, peca)}
                             >
                                 {peca !== ' ' && (
